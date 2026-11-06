@@ -6,6 +6,8 @@ github.com/alessio/shellescape v1.4.1 h1:V7yhSDDn8LP4lc4jS8pFkt0zCnzVJlG5JXy9BVK
 github.com/alessio/shellescape v1.4.1/go.mod h1:PZAiSCk0LJaZkiCSkPv8qIobYglO3FPpyFjDCtHLS30=
 github.com/andybalholm/brotli v1.2.2 h1:HzTuoo2ErYQqf5qvcJInB8uvqSVxRttzkFexPWtnceM=
 github.com/andybalholm/brotli v1.2.2/go.mod h1:rzTDkvFWvIrjDXZHkuS16NPggd91W3kUSvPlQ1pLaKY=
+github.com/apernet/quic-go v0.63.1-0.20261004002722-3e251ad70ec5 h1:RwzCV9e2E9j/YmNqStq+g0mGwVjTVYYhDRKvKLq9jrI=
+github.com/apernet/quic-go v0.63.1-0.20261004002722-3e251ad70ec5/go.mod h1:V5cuc1OxYYDdr+TgQThkS0e15A0yF4U0yr03MA2FP3U=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/bytedance/gopkg v0.1.3 h1:TPBSwH8RsouGCBcMBktLt1AymVo2TVsBVCY4b6TnZ/M=
@@ -196,8 +198,6 @@ github.com/quic-go/go-ossfuzz-seeds v0.1.0 h1:APacT+iIaNF6fd8AGEiN3bT/Jtkd2jz4v4
 github.com/quic-go/go-ossfuzz-seeds v0.1.0/go.mod h1:3IOHRbJIc+L6YKMwfDtJAM9Vj9k0YY4muhuyUYk5tbk=
 github.com/quic-go/qpack v0.6.0 h1:g7W+BMYynC1LbYLSqRt8PBg5Tgwxn214ZZR34VIOjz8=
 github.com/quic-go/qpack v0.6.0/go.mod h1:lUpLKChi8njB4ty2bFLX2x4gzDqXwUpaO1DP9qMDZII=
-github.com/quic-go/quic-go v0.63.0 h1:LIFGHI4PFUhhw2dDD1ARHdCff143ffMHwZtbnbuJ78A=
-github.com/quic-go/quic-go v0.63.0/go.mod h1:RAro2j2yN9a9EiPACLHT9IB2NXCvGQmmo/alT0yYI0w=
 github.com/quic-go/webtransport-go v0.13.0 h1:RJLrTUHlTj8jJaQlQJUy0z0Mf7u1fVM0I6L1b9pe2M0=
 github.com/quic-go/webtransport-go v0.13.0/go.mod h1:K83X9YHbAqgSLO6ikS6BXCMdWOvqh9JTHALulvb2JVk=
 github.com/refraction-networking/utls v1.8.2 h1:j4Q1gJj0xngdeH+Ox/qND11aEfhpgoEvV+S9iJ2IdQo=

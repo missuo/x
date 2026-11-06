@@ -141,3 +141,5 @@ require (
 )
 
 replace github.com/ugorji/go v1.1.4 => github.com/ugorji/go/codec v1.2.12
+
+replace github.com/quic-go/quic-go => github.com/apernet/quic-go v0.63.1-0.20261004002722-3e251ad70ec5

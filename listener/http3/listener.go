@@ -1,6 +1,7 @@
 package http3
 
 import (
+	"context"
 	"net"
 	"net/http"
 	"sync"
@@ -12,6 +13,8 @@ import (
 	ictx "github.com/go-gost/x/internal/ctx"
 	xnet "github.com/go-gost/x/internal/net"
 	xhttp "github.com/go-gost/x/internal/net/http"
+	"github.com/go-gost/x/internal/util/quic/congestion"
+	"github.com/go-gost/x/internal/util/quic/congestion/bbr"
 	mdx "github.com/go-gost/x/metadata"
 	"github.com/go-gost/x/registry"
 	"github.com/quic-go/quic-go"
@@ -80,6 +83,13 @@ func (l *http3Listener) Init(md md.Metadata) (err error) {
 		EnableDatagrams: l.md.enableDatagrams,
 		Handler:         http.HandlerFunc(l.handleFunc),
 	}
+	if l.md.cc != "" {
+		l.logger.Infof("congestion control: %s", l.md.cc)
+		l.server.ConnContext = func(ctx context.Context, c *quic.Conn) context.Context {
+			l.useCongestionControl(c)
+			return ctx
+		}
+	}
 
 	ln, err := quic.ListenAddrEarly(addr, http3.ConfigureTLSConfig(l.server.TLSConfig), l.server.QUICConfig.Clone())
 	if err != nil {
@@ -96,6 +106,18 @@ func (l *http3Listener) Init(md md.Metadata) (err error) {
 	}()
 
 	return
+}
+
+// useCongestionControl replaces the congestion controller of a new QUIC
+// connection, the way Hysteria does after authentication. It governs this
+// side's sending, i.e. the server to client (download) direction.
+func (l *http3Listener) useCongestionControl(c *quic.Conn) {
+	switch l.md.cc {
+	case ccBrutal:
+		congestion.UseBrutal(c, l.md.ccUp, l.md.ccDisableLossCompensation)
+	case ccBBR:
+		congestion.UseBBR(c, bbr.Profile(l.md.ccBBRProfile))
+	}
 }
 
 func (l *http3Listener) Accept() (conn net.Conn, err error) {
