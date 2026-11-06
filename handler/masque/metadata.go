@@ -25,6 +25,11 @@ type metadata struct {
 	bufferSize int
 	// authBasicRealm is the realm string sent in Proxy-Authenticate challenges.
 	authBasicRealm string
+	// masquerade is the URL of a website that answers everything but
+	// authenticated MASQUE requests (Hysteria's masquerade).
+	masquerade string
+	// masqueradeInsecure skips verifying the masquerade site's certificate.
+	masqueradeInsecure bool
 	// idleTimeout is the read timeout for both TCP and UDP (CONNECT-UDP)
 	// relays. After this duration with no traffic in a direction, that relay
 	// is terminated and its sockets released.
@@ -56,6 +61,8 @@ func (h *masqueHandler) parseMetadata(md mdata.Metadata) (err error) {
 	}
 
 	h.md.authBasicRealm = mdutil.GetString(md, "authBasicRealm")
+	h.md.masquerade = mdutil.GetString(md, "masquerade")
+	h.md.masqueradeInsecure = mdutil.GetBool(md, "masquerade.insecure")
 
 	h.md.observerPeriod = mdutil.GetDuration(md, "observePeriod", "observer.period", "observer.observePeriod")
 	if h.md.observerPeriod == 0 {

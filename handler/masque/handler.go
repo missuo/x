@@ -110,6 +110,7 @@ type masqueHandler struct {
 	limiter  traffic.TrafficLimiter    // cached traffic limiter wrapping the global limiter
 	cancel   context.CancelFunc        // cancels the background observer goroutine
 	recorder recorder.RecorderObject   // traffic recorder for handler-level events
+	masq     http.Handler              // serves non-MASQUE requests when masquerade is set
 }
 
 // NewHandler creates a new MASQUE handler instance. It supports CONNECT-UDP
@@ -134,6 +135,14 @@ func NewHandler(opts ...handler.Option) handler.Handler {
 func (h *masqueHandler) Init(md md.Metadata) error {
 	if err := h.parseMetadata(md); err != nil {
 		return err
+	}
+
+	if h.md.masquerade != "" {
+		masq, err := newMasquerade(h.md.masquerade, h.md.masqueradeInsecure)
+		if err != nil {
+			return err
+		}
+		h.masq = masq
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -253,6 +262,10 @@ func (h *masqueHandler) Handle(ctx context.Context, conn net.Conn, opts ...handl
 
 	// Validate CONNECT method
 	if r.Method != http.MethodConnect {
+		if h.masquerade(w, r) {
+			log.Debugf("masque: masquerade %s %s", r.Method, r.URL.Path)
+			return nil
+		}
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		log.Error(ErrMethodNotAllowed)
 		return ErrMethodNotAllowed
@@ -271,6 +284,10 @@ func (h *masqueHandler) Handle(ctx context.Context, conn net.Conn, opts ...handl
 		ro.Network = "tcp"
 		return h.handleConnectTCP(ctx, w, r, conn.LocalAddr(), ro, log, pStats)
 	default:
+		if h.masquerade(w, r) {
+			log.Debugf("masque: masquerade CONNECT %s", r.Proto)
+			return nil
+		}
 		w.WriteHeader(http.StatusBadRequest)
 		log.Errorf("masque: unsupported protocol: %s", r.Proto)
 		return ErrBadRequest
@@ -767,6 +784,13 @@ func (h *masqueHandler) authenticate(ctx context.Context, w http.ResponseWriter,
 		return "", true
 	}
 	if id, ok = h.options.Auther.Authenticate(ctx, u, p, auth.WithService(h.options.Service)); ok {
+		return
+	}
+
+	// With a masquerade site, a failed login looks like any other request to
+	// it rather than a proxy asking for credentials.
+	if h.masquerade(w, r) {
+		log.Debug("masque: authentication failed, masquerade")
 		return
 	}
 
